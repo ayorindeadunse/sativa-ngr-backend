@@ -1,7 +1,7 @@
 {
   "name": "vendor-central-api",
   "version": "1.0.0",
-  "description": "Restful api for vendor central e-commerce app",
+  "description": "Rest api for vendor-central e-commerce app",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
