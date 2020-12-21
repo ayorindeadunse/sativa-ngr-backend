@@ -25,11 +25,17 @@ const UserSchema = new mongoose.Schema({
   },
   isAdmin: {
     type: Boolean,
+    default: false,
   },
   status: {
     type: String,
+    default: "Pending",
   },
-  date: {
+  accepted: {
+    type: Boolean,
+    required: true,
+  },
+  dateCreated: {
     type: Date,
     default: Date.now,
   },

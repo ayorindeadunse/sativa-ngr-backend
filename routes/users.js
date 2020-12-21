@@ -4,8 +4,10 @@ const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("config");
+const cryptoRandomString = require("crypto-random-string");
 const { check, validationResult } = require("express-validator");
 const User = require("../models/User");
+const Codes = require("../models/codes");
 
 // create a user
 router.post(
@@ -23,10 +25,13 @@ router.post(
       .isLength({
         min: 8,
       })
-      .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i"),
+      .matches(
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,}$/
+      ),
     check("password", "Password is required").not().isEmpty(),
 
     check("mobile", "Mobile Number is required").not().isEmpty(),
+    check("acceptance", "Please accept the terms of use.").not().isEmpty(),
   ],
 
   // check validation errors
@@ -37,10 +42,17 @@ router.post(
     }
 
     // destructure the body of the request
-    const { firstName, lastName, email, mobile, password } = req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      mobile,
+      password,
+      acceptance,
+    } = req.body;
     // set isAdmin property to false because this is a regular user registration form
-    let isAdmin = false;
-    let status = "pending verification";
+    // let isAdmin = false;
+    // let status = "Pending";
 
     try {
       // check if user exists in the database using both the email address and mobile number
@@ -68,8 +80,7 @@ router.post(
         avatar,
         mobile,
         password,
-        status,
-        isAdmin,
+        acceptance,
       });
 
       // Encrypt password
@@ -77,10 +88,12 @@ router.post(
       user.password = await bcrypt.hash(password, salt);
       await user.save();
 
-      // send verification code via sms and e-mail for user, if successful,
-      // update status to active.
+      //create secret code and save secret to database with user account.
 
-      // return jsonwebtoken to client
+      // send email with activation link to user
+
+      // return jsonwebtoken to client. This code section will be also part of the logic for the activateUser and
+      //auth routes.
       const payload = {
         user: {
           userId: user._id,
@@ -95,15 +108,32 @@ router.post(
           //features but cannot buy any products
         },
       };
-      jwt.sign(
+      const token = jwt.sign(
         payload,
         config.get("jwtSecret"),
         { expiresIn: 360000 },
-        (err, token) => {
+        (err) => {
           if (err) throw err;
         }
       );
-      res.status(201).send(user);
+      req.session.token = token;
+
+      // send verification code to user.
+      const baseUrl = req.protocol + "://" + req.get("host");
+      //algo to create secret code
+      const secretCode = cryptoRandomString({
+        length: 6,
+      });
+      saveCode = new Codes({
+        email: user.email,
+        code: secretCode,
+      });
+
+      await saveCode.save();
+
+      // send verification e-mail to user
+
+      // res.status(201).send(user);
     } catch (error) {
       //log using log library
       console.error(err.message);
