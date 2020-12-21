@@ -13,14 +13,19 @@ router.post(
   [
     check("firstName", "First Name is required").not().isEmpty(),
     check("lastName", "Last Name is required").not().isEmpty(),
+    // confirm that an actual e-mail was used
+    check("email", "Please use an actual e-mail address").not().isEmail(),
+    check("email", "Email is required").not().isEmpty(),
     check(
       "password",
-      "Please enter a password with 8 or more characters"
-    ).isLength({
-      min: 8,
-      // consider using regular expressions for password pattern
-    }),
+      "Please enter a password with 8 or more characters,has at least one uppercase letter, one lowercase letter, and one special character"
+    )
+      .isLength({
+        min: 8,
+      })
+      .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i"),
     check("password", "Password is required").not().isEmpty(),
+
     check("mobile", "Mobile Number is required").not().isEmpty(),
   ],
 
@@ -33,12 +38,12 @@ router.post(
 
     // destructure the body of the request
     const { firstName, lastName, email, mobile, password } = req.body;
-    // set isAdmin property to true
-    let isAdmin = true;
+    // set isAdmin property to false because this is a regular user registration form
+    let isAdmin = false;
 
     try {
-      // check if user exists in the database
-      let user = await User.findOne({ email });
+      // check if user exists in the database using both the email address and mobile number
+      let user = await User.findOne({ email, mobile });
       if (user) {
         return res
           .status(400)
