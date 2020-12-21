@@ -40,6 +40,7 @@ router.post(
     const { firstName, lastName, email, mobile, password } = req.body;
     // set isAdmin property to false because this is a regular user registration form
     let isAdmin = false;
+    let status = "pending verification";
 
     try {
       // check if user exists in the database using both the email address and mobile number
@@ -67,6 +68,7 @@ router.post(
         avatar,
         mobile,
         password,
+        status,
         isAdmin,
       });
 
@@ -87,7 +89,10 @@ router.post(
           mobile: user.mobile,
           email: user.email,
           isAdmin: user.isAdmin,
+          status: user.status,
           // consider other properties to add to payload
+          // in the object that is sent back to the client, if status is "pending activation", user can see only limited
+          //features but cannot buy any products
         },
       };
       jwt.sign(
