@@ -8,10 +8,11 @@ const cryptoRandomString = require("crypto-random-string");
 const { check, validationResult } = require("express-validator");
 const User = require("../models/User");
 const Codes = require("../models/codes");
+const emailService = require("../utils/nodemailer");
 
 // create a user
 router.post(
-  "/",
+  "/register",
   [
     check("firstName", "First Name is required").not().isEmpty(),
     check("lastName", "Last Name is required").not().isEmpty(),
@@ -132,7 +133,18 @@ router.post(
       await saveCode.save();
 
       // send verification e-mail to user
+      const data = {
+        from: `VENDOR CENTRAL<${config.get("EMAIL_USERNAME")}>`,
+        to: user.email,
+        subject: "Activation link for Vendor Central Registration",
+        text: `Please use the following link within the next 10 minutes to activate your account on YOUR APP: ${baseUrl}/api/activateUser/verification/verify-account/${user._id}/${secretCode}`,
+        html: `<p>Please use the following link within the next 10 minutes to activate your account on YOUR APP: <strong><a href="${baseUrl}/api/activateUser/verification/verify-account/${user._id}/${secretCode}" target="_blank">Activate Account</a></strong></p>`,
+      };
 
+      //send e-mail
+      await emailService.sendMail(data);
+
+      //send json object back to client with user data.
       // res.status(201).send(user);
     } catch (error) {
       //log using log library
