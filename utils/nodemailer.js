@@ -19,7 +19,7 @@ const config = require("config");
 const emailService = nodemailer.createTransport({
   host: config.get("EMAIL_HOST"),
   port: config.get("EMAIL_PORT"),
-  secure: false, // remember to set to true when test works
+  secure: true, // remember to set to true when test works
   auth: {
     user: config.get("EMAIL_USERNAME"),
     pass: config.get("EMAIL_PASSWORD"),

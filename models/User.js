@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
   },
   mobile: {
-    type: Number,
+    type: String,
     required: true,
   },
   isAdmin: {
