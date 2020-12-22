@@ -28,9 +28,7 @@ router.post(
     check(
       "password",
       "Your password needs to have at least one uppercase letter, one lowercase letter, and one special character"
-    ).matches(
-      "/^(?=.*d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*s).{6,}$/"
-    ),
+    ).matches(/^(?=.*d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*s).{6,}$/),
     check("password", "Password is required").not().isEmpty(),
 
     check("mobile", "Mobile Number is required").not().isEmpty(),
