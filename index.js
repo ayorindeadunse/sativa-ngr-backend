@@ -8,6 +8,7 @@ const compression = require("compression");
 const config = require("config");
 //users
 const users = require("./routes/users");
+const activateUser = require("./routes/activateUser");
 const app = express();
 
 //connect to the Database
@@ -19,6 +20,7 @@ app.use(compression());
 
 // add routes
 app.use("/api/users", users);
+app.use("/api/activateUser", activateUser);
 const port = process.env.PORT || config.get("port");
 app.listen(port, () => {
   console.log(`Server started on port ${port}...`);
