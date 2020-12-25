@@ -71,11 +71,12 @@ router.post(
       // if status is "pending", redirect user to
       // pending email activation page, (just do it )
 
-      if (status === "pending") {
+      if (status === "Pending") {
+        res.send(token);
         redirectPath = `http://localhost:4200/activate-email`;
         res.redirect(redirectPath);
       }
-      res.send(token);
+
       // in one breath on the server. Else, use the
       // token sent in protected routes. Do this in other
       // pages.

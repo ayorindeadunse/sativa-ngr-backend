@@ -8,6 +8,8 @@ const cryptoRandomString = require("crypto-random-string");
 const { check, validationResult } = require("express-validator");
 const User = require("../models/User");
 const Codes = require("../models/codes");
+const authenticateTokenWhilePending = require("../middleware/checkAuthWhilePending");
+const emailService = require("../utils/nodemailer");
 
 /***
  *
@@ -83,5 +85,59 @@ router.get(
 // #desc:   Send activation email to registered users email address
 // #access: Private
 
-router.get("/verification/get-activation-email");
+router.get(
+  "/verification/get-activation-email",
+  authenticateTokenWhilePending,
+  async (req, res) => {
+    // get the url
+
+    const baseUrl = req.protocol + "://" + req.get("host");
+
+    try {
+      const user = await User.findById(req.userId);
+
+      // if user does not exist
+      if (!user) {
+        res.json({ success: false });
+      } else {
+        // delete existing secret codes tied to this email address and regenerate another.
+        await Codes.deleteMany({ email: user.email });
+
+        // create another secret code.
+
+        const secretCode = cryptoRandomString({
+          length: 6,
+        });
+
+        const newCode = new Codes({
+          code: secretCode,
+          email: user.email,
+        });
+
+        await newCode.save();
+
+        const data = {
+          from: `VENDOR CENTRAL<${config.get("EMAIL_USERNAME")}>`,
+          to: user.email,
+          subject: "Activation link for Vendor Central Registration",
+          text: `Please use the following link within the next 10 minutes to activate your account on Vendor Central: ${baseUrl}/api/activateUser/verification/verify-account/${user._id}/${secretCode}`,
+          html: `<p>Hi ${user.firstName},</p><p>Please use the following link within the next 10 minutes to activate your account on Vendor Central: <strong><a href="${baseUrl}/api/activateUser/verification/verify-account/${user._id}/${secretCode}" target="_blank">Activate Account</a></strong></p><br /><p>Thank You.</p><p>The Vendor Central Team.</p>`,
+        };
+
+        await emailService.sendMail(data);
+
+        // send response to client
+        res.json({ success: true });
+      }
+    } catch (error) {
+      // log error to console
+      console.log(
+        "Error on /api/activateUser/verification/get-activation-email: ",
+        error
+      );
+      res.json({ success: false });
+    }
+  }
+);
+
 module.exports = router;
