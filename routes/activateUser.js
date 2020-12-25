@@ -32,7 +32,7 @@ router.get(
         code: req.params.secretCode,
       });
 
-      // if user does not exits
+      // if user does not exist
       if (!user) {
         res.status(401).send("User does not exist.");
       } else {

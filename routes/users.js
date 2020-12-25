@@ -140,7 +140,11 @@ router.post(
       await emailService.sendMail(data);
 
       //send json object back to client with user data.
-      res.status(201).send(user);
+      //res.status(201).send(user);
+
+      // Redirect User to Activate Email page.
+      redirectPath = `http://localhost:4200/activate-email`;
+      res.redirect(redirectPath);
     } catch (error) {
       //log using log library
       console.error(error.message);
