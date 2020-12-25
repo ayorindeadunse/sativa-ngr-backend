@@ -79,4 +79,9 @@ router.get(
   }
 );
 
+// #route:  GET /verification/get-activation-email
+// #desc:   Send activation email to registered users email address
+// #access: Private
+
+router.get("/verification/get-activation-email");
 module.exports = router;
