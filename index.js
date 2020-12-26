@@ -18,6 +18,24 @@ app.use(express.json());
 app.use(helmet());
 app.use(compression());
 
+// enable CORS
+/*** check best practices for enabling CORS on the server
+ * in node apps
+ */
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PATCH,PUT,DELETE,OPTIONS"
+  );
+  next();
+});
 // add routes
 app.use("/api/users", users);
 app.use("/api/activateUser", activateUser);
