@@ -3,7 +3,8 @@ const config = require("config");
 
 module.exports = async (req, res, next) => {
   // get user token from the headers
-  const token = req.header("x-auth-token");
+  // const token = req.header("x-auth-token");
+  const token = req.headers.authorization.split(" ")[1];
 
   //if token does not exist
   if (!token)
@@ -14,7 +15,9 @@ module.exports = async (req, res, next) => {
   try {
     // Get payload data
     const payload = await jwt.verify(token, config.get("jwtSecret"));
-    req.user = payload.user;
+    req.userId = payload._id;
+    req.userStatus = payload.status;
+    req.email = payload.email;
 
     next();
   } catch (error) {
