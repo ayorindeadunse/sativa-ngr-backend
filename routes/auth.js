@@ -61,10 +61,15 @@ router.post(
       jwt.sign(
         payload,
         config.get("jwtSecret"),
-        { expiresIn: 60 * 60 * 24 * 14 },
+        // { expiresIn: 60 * 60 * 24 * 14 },
         (err, token) => {
           if (err) throw err;
-          res.send(token);
+          //   res.send(token);
+          res.status(200).json({
+            token: token,
+            expiresIn: 60 * 60 * 24 * 14,
+            user: payload.user,
+          });
         }
       );
 
