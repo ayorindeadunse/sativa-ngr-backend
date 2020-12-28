@@ -13,9 +13,10 @@ const authenticateTokenWhilePending = (req, res, next) => {
     //verify token
     // const payload = jwt.verify(token, process.env.JWT_KEY);
     const payload = jwt.verify(token, config.get("jwtSecret"));
-    req.userId = payload._id;
+    /*req.userId = payload._id;
     req.userStatus = payload.status;
-    req.email = payload.email;
+    req.email = payload.email;*/
+    res.user = payload.user;
 
     next();
 

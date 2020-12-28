@@ -36,7 +36,7 @@ router.post(
           .json({ errors: [{ msg: "invalid Credentials " }] });
       }
       // check if password matches what's in the database
-      const isMatch = await bcrypt.compare(pasword, user.password);
+      const isMatch = await bcrypt.compare(password, user.password);
       // if it doesn't match
       if (!isMatch) {
         return res
@@ -58,24 +58,24 @@ router.post(
         },
       };
 
-      const token = jwt.sign(
+      jwt.sign(
         payload,
         config.get("jwtSecret"),
         { expiresIn: 60 * 60 * 24 * 14 },
-        (err) => {
+        (err, token) => {
           if (err) throw err;
-          //  res.send(token);
+          res.send(token);
         }
       );
 
       // if status is "pending", redirect user to
       // pending email activation page, (just do it )
 
-      if (status === "Pending") {
+      /*  if (status === "Pending") {
         res.send(token);
         redirectPath = `http://localhost:4200/activate-email`;
         res.redirect(redirectPath);
-      }
+      }*/
 
       // in one breath on the server. Else, use the
       // token sent in protected routes. Do this in other
@@ -83,7 +83,10 @@ router.post(
     } catch (error) {
       // remember to use logger
       console.log("Error on /api/auth/login: ", error.message);
-      res.status(500).send("Error on /api/auth/login: ", error.message);
+      // res.status(500).send("Error on /api/auth/login: ", error.message);
+      res.json({ success: false });
     }
   }
 );
+
+module.exports = router;

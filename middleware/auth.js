@@ -15,9 +15,10 @@ module.exports = async (req, res, next) => {
   try {
     // Get payload data
     const payload = await jwt.verify(token, config.get("jwtSecret"));
-    req.userId = payload._id;
+    /* req.userId = payload._id;
     req.userStatus = payload.status;
-    req.email = payload.email;
+    req.email = payload.email;*/
+    res.user = payload.user;
 
     next();
   } catch (error) {
