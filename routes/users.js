@@ -143,8 +143,15 @@ router.post(
       //res.status(201).send(user);
 
       // Redirect User to Activate Email page.
-      redirectPath = `http://localhost:4200/activate-email`;
-      res.redirect(redirectPath);
+
+      //    redirectPath = `http://localhost:4200/activate-email`;
+      //    res.redirect(redirectPath);
+
+      // send user object back to client
+
+      res.status(200).json({
+        user: payload.user,
+      });
     } catch (error) {
       //log using log library
       console.error(error.message);
