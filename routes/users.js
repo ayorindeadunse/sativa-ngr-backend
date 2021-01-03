@@ -155,7 +155,8 @@ router.post(
     } catch (error) {
       //log using log library
       console.error(error.message);
-      res.status(500).send("An error occured on the server");
+      //    res.status(500).send("An error occured on the server");
+      res.status(500).json({ msg: error.message });
     }
   }
 );
